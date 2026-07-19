@@ -8,19 +8,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+// 👇 Haze के नए इम्पोर्ट
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeChild
 
-// अपडेटेड कोड: यहाँ से blur हटा दिया गया है
 fun Modifier.realGlassModifier(
+    hazeState: HazeState, // 👈 यह कनेक्शन है जो बैकग्राउंड और बटन को जोड़ेगा
     cornerRadius: Dp = 16.dp,
-    glassAlpha: Float = 0.15f // यह डिफ़ॉल्ट पारदर्शिता है
+    glassAlpha: Float = 0.15f
 ): Modifier {
     return this
         .clip(RoundedCornerShape(cornerRadius))
-        // बैकग्राउंड को पारदर्शी सफेद करेगा
-        .background(Color.White.copy(alpha = glassAlpha)) 
+        // 👇 असली जादू: यह टेक्स्ट को छोड़ेगा और सिर्फ पीछे की चीज़ों को ब्लर करेगा
+        .hazeChild(state = hazeState) 
+        .background(Color.White.copy(alpha = glassAlpha))
         .border(
-            width = 1.5.dp, // चमकता हुआ सफेद बॉर्डर
-            color = Color.White.copy(alpha = 0.5f),
+            width = 1.dp, // थोड़ा पतला बॉर्डर iPhone जैसा लगता है
+            color = Color.White.copy(alpha = 0.4f),
             shape = RoundedCornerShape(cornerRadius)
         )
 }
