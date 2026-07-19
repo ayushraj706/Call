@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember // 👈 इसे जोड़ा है
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +47,10 @@ import com.talsk.amadz.ui.theme.AmadzTheme
 import com.talsk.amadz.ui.theme.green
 import com.talsk.amadz.ui.theme.red
 import com.talsk.amadz.util.secondsToReadableTime
+
+// 👇 Haze लाइब्रेरी के इम्पोर्ट्स
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.haze
 
 /**
  * Created by Muhammad Usman : msusman97@gmail.com on 11/17/2023.
@@ -83,6 +88,9 @@ fun CallScreen(
 ) {
 
     var keyboardOpen by rememberSaveable { mutableStateOf(false) }
+    // 👇 1. HazeState का मेन कनेक्शन बनाया
+    val hazeState = remember { HazeState() }
+
     LaunchedEffect(uiState) {
         Log.d("CallScreen", "uiState: $uiState")
         if (uiState == CallState.CallDisconnected) {
@@ -98,7 +106,6 @@ fun CallScreen(
         )
     }
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -106,7 +113,8 @@ fun CallScreen(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         CallHeader(
-            modifier = Modifier.weight(1.0f),
+            // 👇 2. पीछे वाली कॉलर इन्फो को बताया कि जब कीपैड आए तो उसे ब्लर होना है
+            modifier = Modifier.weight(1.0f).haze(state = hazeState),
             contact = contact.contact,
             companyName = contact.companyName,
             uiState = uiState,
@@ -115,6 +123,7 @@ fun CallScreen(
 
         KeyPad(
             keyboardOpen = keyboardOpen,
+            hazeState = hazeState, // 👇 3. कीपैड को कनेक्शन पास कर दिया
             startTone = { onAction(CallAction.StartDialTone(it)) },
             stopTone = { onAction(CallAction.StopDialTone) }
         )
@@ -172,9 +181,13 @@ fun CallHeader(
     uiState: CallState,
     onContactDetailClick: (Contact) -> Unit
 ) {
-    Surface {
+    Surface(
+        // यहाँ Surface का बैकग्राउंड Transparent करना ज़रूरी है ताकि Haze काम कर सके
+        color = Color.Transparent, 
+        modifier = modifier
+    ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -214,16 +227,21 @@ fun CallHeader(
 }
 
 @Composable
-fun KeyPad(keyboardOpen: Boolean, startTone: (Char) -> Unit, stopTone: () -> Unit) {
+fun KeyPad(
+    keyboardOpen: Boolean, 
+    hazeState: HazeState, // 👇 4. नए पैरामीटर को रिसीव किया 
+    startTone: (Char) -> Unit, 
+    stopTone: () -> Unit
+) {
     var dialed by rememberSaveable { mutableStateOf("") }
     androidx.compose.animation.AnimatedVisibility(
         visible = keyboardOpen,
         enter = fadeIn() + slideInVertically { it / 2 },
         exit = slideOutVertically { it / 2 } + fadeOut(),
-
-        ) {
-
+    ) {
+        // 👇 5. असली कीपैड में HazeState पास किया
         KeyPad(
+            hazeState = hazeState, 
             phone = dialed,
             onTapDown = {
                 dialed += it
