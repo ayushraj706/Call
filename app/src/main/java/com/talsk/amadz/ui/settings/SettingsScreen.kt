@@ -31,6 +31,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.talsk.amadz.core.DtmfTonePrefs
 
+// ⚠️ अगर तुमने GlassSettingsScreen.kt को किसी दूसरे फोल्डर (जैसे theme) में बनाया है, 
+// तो हो सकता है तुम्हें यहाँ ऊपर उसे import करना पड़े। 
+// जैसे: import com.talsk.amadz.ui.theme.GlassSettingsScreen
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -121,6 +125,11 @@ fun SettingsScreen(
                 headlineContent = { Text("Clear call logs") },
                 supportingContent = { Text("Delete all call history") }
             )
+
+            // 👇👇👇 यहाँ हमने तुम्हारी ग्लास वाली सेटिंग जोड़ दी है 👇👇👇
+            GlassSettingsScreen()
+            // 👆👆👆 ------------------------------------------- 👆👆👆
+
         }
     }
 
