@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember // 👈 इसे इम्पोर्ट किया
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -44,6 +45,9 @@ import com.talsk.amadz.ui.extensions.openContactAddScreen
 import com.talsk.amadz.ui.extensions.openContactDetailScreen
 import com.talsk.amadz.ui.home.HeaderItem
 import com.talsk.amadz.ui.home.KeyPad
+// 👇 Haze के इम्पोर्ट
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.haze
 
 
 enum class SearchBarState {
@@ -71,6 +75,9 @@ fun HomeSearchBar(
     val query by vm.query.collectAsStateWithLifecycle()
     val padding by animateDpAsState(if (searchBarState == SearchBarState.COLLAPSED) 16.dp else 0.dp)
     var dialPadPhone by rememberSaveable { mutableStateOf("") }
+    
+    // 👇 यहाँ HazeState का मेन कनेक्शन बनाया गया है
+    val hazeState = remember { HazeState() } 
 
     BackHandler(enabled = searchBarState.isActive()) {
         vm.onSearchQueryChanged("")
@@ -148,7 +155,8 @@ fun HomeSearchBar(
                 SearchResults(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .weight(1f)
+                        .haze(state = hazeState), // 👈 बैकग्राउंड लिस्ट को बताया कि उसे ब्लर होना है
                     dialPadPhone = dialPadPhone,
                     filteredContacts = contacts,
                     onContactDetailClick = {
@@ -160,6 +168,7 @@ fun HomeSearchBar(
                 if (searchBarState == SearchBarState.EXPANDED_WITH_DIAL_PAD) {
                     KeyPad(
                         modifier = Modifier.fillMaxWidth(),
+                        hazeState = hazeState, // 👈 कीपैड को कनेक्शन दे दिया
                         phone = dialPadPhone,
                         onTapDown = { char ->
                             vm.startTone(char)
