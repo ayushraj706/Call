@@ -1,0 +1,24 @@
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+// यह हमारा स्मार्ट साँचा (Modifier) है
+fun Modifier.glassModifier(
+    cornerRadius: Dp = 16.dp, // कोनों की गोलाई
+    glassAlpha: Float = 0.2f, // कांच कितना पारदर्शी होगा (0.0 से 1.0)
+    borderAlpha: Float = 0.4f // बॉर्डर की चमक
+): Modifier {
+    return this
+        .clip(RoundedCornerShape(cornerRadius)) // डिब्बे को गोल करता है
+        .background(Color.White.copy(alpha = glassAlpha)) // पारदर्शी सफेद रंग (कांच जैसा)
+        .border(
+            width = 1.dp, // बॉर्डर की मोटाई
+            color = Color.White.copy(alpha = borderAlpha), // पारदर्शी सफेद बॉर्डर
+            shape = RoundedCornerShape(cornerRadius)
+        )
+}
