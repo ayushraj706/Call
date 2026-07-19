@@ -57,12 +57,9 @@ android {
         }
     }
     dependenciesInfo {
-        // Disables dependency metadata when building APKs.
         includeInApk = false
-        // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
     }
-
 }
 kotlin {
     compilerOptions {
@@ -72,7 +69,6 @@ kotlin {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -98,4 +94,6 @@ dependencies {
     implementation(libs.androidx.paging)
     implementation(libs.androidx.paging.compose)
 
+    // 👇 असली iPhone ग्लास इफ़ेक्ट के लिए Haze लाइब्रेरी 👇
+    implementation("dev.chrisbanes.haze:haze:1.1.1")
 }
