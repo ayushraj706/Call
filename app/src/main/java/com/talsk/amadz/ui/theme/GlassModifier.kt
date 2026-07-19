@@ -11,30 +11,21 @@ import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeChild
 
-// 1. पुरानी स्क्रीन्स के लिए (बिना Haze के) - इससे तुम्हारा एरर ठीक हो जाएगा
 fun Modifier.realGlassModifier(
     cornerRadius: Dp = 16.dp,
-    glassAlpha: Float = 0.15f
+    glassAlpha: Float = 0.15f,
+    hazeState: HazeState? = null // 👈 इसे Optional (null) बना दिया है
 ): Modifier {
-    return this
-        .clip(RoundedCornerShape(cornerRadius))
-        .background(Color.White.copy(alpha = glassAlpha))
-        .border(
-            width = 1.dp,
-            color = Color.White.copy(alpha = 0.4f),
-            shape = RoundedCornerShape(cornerRadius)
-        )
-}
-
-// 2. डायलर और नई स्क्रीन्स के लिए (Haze बैकग्राउंड ब्लर के साथ)
-fun Modifier.realGlassModifier(
-    hazeState: HazeState,
-    cornerRadius: Dp = 16.dp,
-    glassAlpha: Float = 0.15f
-): Modifier {
-    return this
-        .clip(RoundedCornerShape(cornerRadius))
-        .hazeChild(state = hazeState) // 👈 असली iOS ब्लर इफ़ेक्ट
+    // 1. बेस मॉडिफायर तैयार करो
+    var modifier = this.clip(RoundedCornerShape(cornerRadius))
+    
+    // 2. असली जादू: अगर किसी फाइल ने hazeState भेजा है, तभी Haze ब्लर लगाओ
+    if (hazeState != null) {
+        modifier = modifier.hazeChild(state = hazeState)
+    }
+    
+    // 3. बाकी का ग्लास इफ़ेक्ट (सफेद पारदर्शी रंग और बॉर्डर) लगाओ
+    return modifier
         .background(Color.White.copy(alpha = glassAlpha))
         .border(
             width = 1.dp,
