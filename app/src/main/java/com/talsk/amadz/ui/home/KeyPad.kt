@@ -41,8 +41,10 @@ import com.talsk.amadz.R
 import com.talsk.amadz.ui.IconButtonLongClickable
 import com.talsk.amadz.ui.theme.AmadzTheme
 
-// 👇 हमने तुम्हारा ग्लास मॉड्यूलर इम्पोर्ट किया है
+// ग्लास मॉड्यूलर इम्पोर्ट
 import com.talsk.amadz.ui.theme.realGlassModifier 
+// 👇 Haze लाइब्रेरी का इम्पोर्ट
+import dev.chrisbanes.haze.HazeState
 
 /**
  * Created by Muhammad Usman : msusman97@gmail.com on 11/21/2023.
@@ -52,9 +54,12 @@ import com.talsk.amadz.ui.theme.realGlassModifier
 @Composable
 fun KeyPadPrew() {
     AmadzTheme(darkTheme = true) {
+        // 👇 Preview को क्रैश होने से बचाने के लिए डमी HazeState
+        val dummyHazeState = remember { HazeState() } 
         Column {
             Spacer(Modifier.height(48.dp))
             KeyPad(
+                hazeState = dummyHazeState, // 👈 यहाँ Haze पास किया
                 phone = "2345",
                 onTapDown = {},
                 onTapUp = {},
@@ -72,6 +77,7 @@ fun KeyPadPrew() {
 @Composable
 fun KeyPad(
     modifier: Modifier = Modifier,
+    hazeState: HazeState, // 👇 1. नया पैरामीटर HazeState 
     phone: String,
     onTapDown: (Char) -> Unit,
     onTapUp: () -> Unit,
@@ -81,15 +87,13 @@ fun KeyPad(
     showCallButton: Boolean,
     showClearButton: Boolean,
 ) {
-    // 👇 1. फोन की मेमोरी से सेटिंग की हुई पारदर्शिता (Alpha) निकाली जा रही है
     val context = LocalContext.current
     val sharedPreferences = remember {
         context.getSharedPreferences("GlassThemePrefs", Context.MODE_PRIVATE)
     }
     val savedAlpha = sharedPreferences.getFloat("glass_alpha", 0.15f)
 
-    Surface(modifier =modifier,
-        // 👇 2. पीछे का सॉलिड रंग हटाकर पारदर्शी (Transparent) किया ताकि ग्लास इफ़ेक्ट दिखे
+    Surface(modifier = modifier,
         color = Color.Transparent, 
     ){
         Column(
@@ -127,47 +131,47 @@ fun KeyPad(
                 }
 
             }
-            // 👇 3. हर बटन में 'savedAlpha' पास किया जा रहा है
+            // 👇 2. हर बटन में hazeState पास किया जा रहा है
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                DialButton(title = '1', subtitle = "", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '2', subtitle = "ABC", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '3', subtitle = "DEF", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
+                DialButton(title = '1', subtitle = "", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '2', subtitle = "ABC", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '3', subtitle = "DEF", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                DialButton(title = '4', subtitle = "GHI", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '5', subtitle = "JKL", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '6', subtitle = "MNO", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
+                DialButton(title = '4', subtitle = "GHI", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '5', subtitle = "JKL", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '6', subtitle = "MNO", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                DialButton(title = '7', subtitle = "PQRS", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '8', subtitle = "TUV", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '9', subtitle = "WXYZ", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
+                DialButton(title = '7', subtitle = "PQRS", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '8', subtitle = "TUV", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '9', subtitle = "WXYZ", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                DialButton(title = '*', subtitle = "", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '0', subtitle = "+", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
-                DialButton(title = '#', subtitle = "", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha)
+                DialButton(title = '*', subtitle = "", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '0', subtitle = "+", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
+                DialButton(title = '#', subtitle = "", onTapDown = onTapDown, onTapUp = onTapUp, savedAlpha = savedAlpha, hazeState = hazeState)
             }
             if (showCallButton) {
                 Button(
                     onClick = { onCallClicked() },
                     contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-                    // कॉल बटन को भी पारदर्शी करके ग्लास लुक दिया गया है
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     modifier = Modifier
                         .height(56.dp)
                         .align(Alignment.CenterHorizontally)
-                        .realGlassModifier(glassAlpha = savedAlpha, cornerRadius = 28.dp)
+                        // कॉल बटन में Haze कनेक्शन
+                        .realGlassModifier(hazeState = hazeState, cornerRadius = 28.dp, glassAlpha = savedAlpha)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_call_24),
@@ -189,7 +193,8 @@ fun RowScope.DialButton(
     subtitle: String,
     onTapDown: (Char) -> Unit,
     onTapUp: () -> Unit,
-    savedAlpha: Float // नया पैरामीटर 
+    savedAlpha: Float,
+    hazeState: HazeState // 👇 3. यहाँ भी HazeState का पैरामीटर
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -197,8 +202,8 @@ fun RowScope.DialButton(
         modifier = Modifier
             .weight(1f)
             .height(56.dp)
-            // 👇 पुराना बैकग्राउंड हटाकर यहाँ ग्लास मॉड्यूलर लगा दिया है
-            .realGlassModifier(glassAlpha = savedAlpha)
+            // 👇 4. असली इफ़ेक्ट यहाँ बटन पर लग रहा है!
+            .realGlassModifier(hazeState = hazeState, glassAlpha = savedAlpha)
             .clip(RoundedCornerShape(16.dp))
             .indication(interactionSource, LocalIndication.current)
             .pointerInput(Unit) {
