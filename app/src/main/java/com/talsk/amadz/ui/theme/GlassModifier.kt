@@ -8,22 +8,36 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-// 👇 Haze के नए इम्पोर्ट
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeChild
 
+// 1. पुरानी स्क्रीन्स के लिए (बिना Haze के) - इससे तुम्हारा एरर ठीक हो जाएगा
 fun Modifier.realGlassModifier(
-    hazeState: HazeState, // 👈 यह कनेक्शन है जो बैकग्राउंड और बटन को जोड़ेगा
     cornerRadius: Dp = 16.dp,
     glassAlpha: Float = 0.15f
 ): Modifier {
     return this
         .clip(RoundedCornerShape(cornerRadius))
-        // 👇 असली जादू: यह टेक्स्ट को छोड़ेगा और सिर्फ पीछे की चीज़ों को ब्लर करेगा
-        .hazeChild(state = hazeState) 
         .background(Color.White.copy(alpha = glassAlpha))
         .border(
-            width = 1.dp, // थोड़ा पतला बॉर्डर iPhone जैसा लगता है
+            width = 1.dp,
+            color = Color.White.copy(alpha = 0.4f),
+            shape = RoundedCornerShape(cornerRadius)
+        )
+}
+
+// 2. डायलर और नई स्क्रीन्स के लिए (Haze बैकग्राउंड ब्लर के साथ)
+fun Modifier.realGlassModifier(
+    hazeState: HazeState,
+    cornerRadius: Dp = 16.dp,
+    glassAlpha: Float = 0.15f
+): Modifier {
+    return this
+        .clip(RoundedCornerShape(cornerRadius))
+        .hazeChild(state = hazeState) // 👈 असली iOS ब्लर इफ़ेक्ट
+        .background(Color.White.copy(alpha = glassAlpha))
+        .border(
+            width = 1.dp,
             color = Color.White.copy(alpha = 0.4f),
             shape = RoundedCornerShape(cornerRadius)
         )
