@@ -1,0 +1,79 @@
+name: Build Amadz Dialer APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "README.md"
+      - ".github/**/*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  build_release:
+    name: Build Release APK
+    if: github.actor != 'dependabot[bot]' && github.actor != 'renovate[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-cleanup: on-success
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Create Keystore Directory
+        run: mkdir -p app/keystore
+
+      - name: Decode Keystore
+        run: echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > app/keystore/release.jks
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --warning-mode summary
+
+      - name: Sign APKs
+        run: |
+          BUILD_TOOLS=$(ls -d $ANDROID_HOME/build-tools/* | tail -1)
+          for apk in $(find app/build/outputs/apk/release -type f -name '*.apk'); do
+            if [[ "$apk" == *"-aligned.apk" || "$apk" == *"-signed.apk" ]]; then
+              continue
+            fi
+            echo "Signing $apk"
+            $BUILD_TOOLS/zipalign -f -p 4 "$apk" "${apk%.apk}-aligned.apk"
+            $BUILD_TOOLS/apksigner sign --ks app/keystore/release.jks --ks-pass pass:${{ secrets.STORE_PASSWORD }} --ks-key-alias ${{ secrets.KEY_ALIAS }} --key-pass pass:${{ secrets.KEY_PASSWORD }} "${apk%.apk}-aligned.apk"
+            rm "$apk"
+            mv "${apk%.apk}-aligned.apk" "${apk%.apk}-signed.apk"
+          done
+
+      - name: Upload Signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Amadz-Release-Signed
+          path: app/build/outputs/apk/release/*-signed.apk
+          if-no-files-found: warn
+
+      - name: Send Telegram Message with Download Link
+        continue-on-error: true
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ✅ Amadz Dialer Build Successful!
+            
+            Commit: ${{ github.event.commits[0].message }}
+            
+            👇 Yahan click karke direct Artifacts (APK) download karein:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
