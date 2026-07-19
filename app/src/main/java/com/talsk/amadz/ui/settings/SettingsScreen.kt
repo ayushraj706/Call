@@ -1,6 +1,5 @@
 package com.talsk.amadz.ui.settings
 
-import com.talsk.amadz.ui.theme.realGlassModifier
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
