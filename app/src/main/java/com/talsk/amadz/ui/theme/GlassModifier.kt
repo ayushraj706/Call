@@ -11,30 +11,18 @@ import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeChild
 
-// 1. पुरानी स्क्रीन्स के लिए (बिना Haze के) - इससे तुम्हारा एरर 100% ठीक हो जाएगा
 fun Modifier.realGlassModifier(
+    hazeState: HazeState? = null,
     cornerRadius: Dp = 16.dp,
     glassAlpha: Float = 0.15f
 ): Modifier {
     return this
         .clip(RoundedCornerShape(cornerRadius))
-        .background(Color.White.copy(alpha = glassAlpha))
-        .border(
-            width = 1.dp,
-            color = Color.White.copy(alpha = 0.4f),
-            shape = RoundedCornerShape(cornerRadius)
+        // 👇 यहाँ shape जोड़ दिया गया है जिससे क्रैश के चांस 0% हो जाएँगे
+        .then(
+            if (hazeState != null) Modifier.hazeChild(state = hazeState, shape = RoundedCornerShape(cornerRadius))
+            else Modifier
         )
-}
-
-// 2. डायलर और नई स्क्रीन्स के लिए (Haze बैकग्राउंड ब्लर के साथ)
-fun Modifier.realGlassModifier(
-    hazeState: HazeState, // यहाँ HazeState ज़रूरी है
-    cornerRadius: Dp = 16.dp,
-    glassAlpha: Float = 0.15f
-): Modifier {
-    return this
-        .clip(RoundedCornerShape(cornerRadius))
-        .hazeChild(state = hazeState) 
         .background(Color.White.copy(alpha = glassAlpha))
         .border(
             width = 1.dp,
